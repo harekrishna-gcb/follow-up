@@ -75,6 +75,16 @@ npm run dev
 Log in with **Admin / 1234**, then immediately go to **Settings → Change PIN**.
 
 ### f. Deploy the frontend (free)
+**GitHub Pages (already set up in this repo):** the workflow
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) runs on every push and pull request.
+It syntax-checks the backend and type-checks and builds the app. Pushes to `main` are also
+deployed to Pages. One-time setup in the GitHub repo:
+1. **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. **Settings → Secrets and variables → Actions → Variables → New repository variable**:
+   `VITE_API_URL` = your `/exec` URL. Use `mock` to publish the demo instead.
+3. Push to `main` (or **Actions → Build & Deploy → Run workflow**). The site appears at
+   `https://<user-or-org>.github.io/<repo>/`.
+
 **Vercel:** push `frontend/` to GitHub → <https://vercel.com/new> → import the repo
 (set *Root Directory* to `frontend` if the repo has both folders) → add the environment variable
 `VITE_API_URL` → Deploy.

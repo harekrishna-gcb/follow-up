@@ -1,0 +1,81 @@
+# Builds the app on every push / pull request and deploys `main` to GitHub Pages.
+#
+# One-time setup in the GitHub repo:
+#   1. Settings → Pages → Build and deployment → Source: "GitHub Actions"
+#   2. Settings → Secrets and variables → Actions → Variables → New repository variable
+#        Name:  VITE_API_URL
+#        Value: your Apps Script Web App URL (ends with /exec)
+#      (Use VITE_API_URL=mock to publish the in-browser demo instead.)
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deployment at a time; don't cancel a deploy that is already running.
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Syntax-check Apps Script backend
+        working-directory: backend
+        run: cat *.gs > "$RUNNER_TEMP/backend.js" && node --check "$RUNNER_TEMP/backend.js"
+
+      - name: Resolve API URL
+        env:
+          API_URL: ${{ vars.VITE_API_URL }}
+          IS_DEPLOY: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        run: |
+          if [ -z "$API_URL" ]; then
+            if [ "$IS_DEPLOY" = "true" ]; then
+              echo "::error::Repository variable VITE_API_URL is not set (Settings → Secrets and variables → Actions → Variables)."
+              exit 1
+            fi
+            API_URL=mock   # pull requests: just verify the build
+          fi
+          echo "VITE_API_URL=$API_URL" >> "$GITHUB_ENV"
+
+      - run: npm ci
+
+      - name: Type-check & build
+        run: npm run build
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
