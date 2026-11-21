@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-slate-200/60 text-slate-900 antialiased;
+    /* Disable the browser's own pull-to-refresh so ours works. */
+    overscroll-behavior-y: none;
+  }
+  /* 16px inputs stop iOS from zooming in on focus. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl bg-white shadow-card ring-1 ring-slate-900/[0.06];
+  }
+  .btn {
+    @apply inline-flex min-h-[44px] select-none items-center justify-center gap-2 rounded-xl px-4 text-[15px] font-semibold transition duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-brand-500 text-white shadow-sm hover:bg-brand-600 active:bg-brand-700;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-slate-800 ring-1 ring-inset ring-slate-200 hover:bg-slate-50 active:bg-slate-100;
+  }
+  .btn-soft {
+    @apply btn bg-brand-50 text-brand-700 hover:bg-brand-100 active:bg-brand-200;
+  }
+  .btn-ghost {
+    @apply btn text-slate-600 hover:bg-slate-100 active:bg-slate-200;
+  }
+  .btn-danger {
+    @apply btn bg-rose-600 text-white hover:bg-rose-700;
+  }
+  .btn-lg {
+    @apply min-h-[56px] rounded-2xl text-base;
+  }
+  .icon-btn {
+    @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 active:scale-95 active:bg-slate-200 disabled:opacity-40;
+  }
+  .input {
+    @apply block min-h-[48px] w-full rounded-xl border-0 bg-slate-50 px-3.5 py-2.5 text-base text-slate-900 ring-1 ring-inset ring-slate-200 transition placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:text-slate-500;
+  }
+  .input-error {
+    @apply ring-rose-400 focus:ring-rose-500;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-slate-700;
+  }
+  .chip {
+    @apply inline-flex h-9 shrink-0 select-none items-center gap-1.5 whitespace-nowrap rounded-full bg-white px-3.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-200 transition active:scale-95;
+  }
+  .chip-active {
+    @apply bg-brand-50 text-brand-700 ring-brand-300;
+  }
+  .section-title {
+    @apply px-1 text-[13px] font-semibold uppercase tracking-wide text-slate-500;
+  }
+}
+
+@layer utilities {
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-callout {
+    -webkit-touch-callout: none;
+  }
+}
